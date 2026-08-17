@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  collector:
+    build:
+      context: ..
+      dockerfile: docker/collector.Dockerfile
+    ports:
+      - "50051:50051"
+      - "9100:9100"
+    environment:
+      GRPC_PORT: "50051"
+      METRICS_PORT: "9100"
+
+  agent:
+    build:
+      context: ..
+      dockerfile: docker/agent.Dockerfile
+    depends_on:
+      - collector
+    environment:
+      AGENT_ID: "agent-local-1"
+      COLLECTOR_ADDRESS: "collector:50051"
+      CAPTURE_INTERVAL_SECONDS: "5"
+      BATCH_FLUSH_SECONDS: "5"
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - collector
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus

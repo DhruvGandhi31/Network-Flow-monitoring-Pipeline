@@ -1,0 +1,4 @@
+grpcio>=1.65
+protobuf>=5.27
+psutil>=6.0
+prometheus-client>=0.20

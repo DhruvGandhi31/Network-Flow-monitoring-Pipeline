@@ -1,0 +1,19 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+build/
+dist/
+
+# Generated protobuf/gRPC stubs — regenerate with scripts/generate_proto.py
+src/netflow_sentry/proto_gen/*_pb2.py
+src/netflow_sentry/proto_gen/*_pb2_grpc.py
+src/netflow_sentry/proto_gen/*.pyi
+
+.env
+.terraform/
+*.tfstate
+*.tfstate.backup
+.pytest_cache/
+.ruff_cache/

@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package netflowsentry;
+
+// A single observed network flow (one active connection at capture time).
+message FlowRecord {
+  string src_ip = 1;
+  uint32 src_port = 2;
+  string dst_ip = 3;
+  uint32 dst_port = 4;
+  string protocol = 5;       // tcp / udp
+  string status = 6;         // ESTABLISHED, LISTEN, TIME_WAIT, ...
+  string process_name = 7;
+  int32 pid = 8;
+  int64 timestamp_unix = 9;
+  string agent_id = 10;
+}
+
+message FlowBatch {
+  string agent_id = 1;
+  int64 batch_timestamp = 2;
+  repeated FlowRecord records = 3;
+}
+
+message BatchAck {
+  bool success = 1;
+  int32 records_received = 2;
+  string message = 3;
+}
+
+// Agents open one long-lived bidirectional stream to the collector:
+// they push FlowBatch messages on an interval, collector acks each one.
+service FlowCollector {
+  rpc StreamFlows(stream FlowBatch) returns (stream BatchAck);
+}

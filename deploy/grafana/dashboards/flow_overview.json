@@ -1,0 +1,66 @@
+{
+  "title": "NetFlow Sentry Overview",
+  "uid": "netflow-sentry-overview",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5s",
+  "time": { "from": "now-15m", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Flow rate by protocol",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (protocol) (rate(netflow_flows_received_total[1m]))",
+          "legendFormat": "{{protocol}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Flow rate by connection status",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (status) (rate(netflow_flows_received_total[1m]))",
+          "legendFormat": "{{status}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Active agents",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 8 },
+      "targets": [{ "expr": "netflow_active_agents" }]
+    },
+    {
+      "id": 4,
+      "title": "Last batch size by agent",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 18, "x": 6, "y": 8 },
+      "targets": [
+        {
+          "expr": "netflow_last_batch_size",
+          "legendFormat": "{{agent_id}}"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Batches received per agent",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 14 },
+      "targets": [
+        {
+          "expr": "sum by (agent_id) (rate(netflow_batches_received_total[1m]))",
+          "legendFormat": "{{agent_id}}"
+        }
+      ]
+    }
+  ]
+}
