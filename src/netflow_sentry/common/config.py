@@ -16,7 +16,7 @@ class AgentConfig:
     batch_flush_seconds: float
 
     @classmethod
-    def from_env(cls) -> "AgentConfig":
+    def from_env(cls) -> AgentConfig:
         return cls(
             agent_id=os.environ.get("AGENT_ID", socket.gethostname()),
             collector_address=os.environ.get("COLLECTOR_ADDRESS", "localhost:50051"),
@@ -31,7 +31,7 @@ class CollectorConfig:
     metrics_port: int
 
     @classmethod
-    def from_env(cls) -> "CollectorConfig":
+    def from_env(cls) -> CollectorConfig:
         return cls(
             grpc_port=int(os.environ.get("GRPC_PORT", "50051")),
             metrics_port=int(os.environ.get("METRICS_PORT", "9100")),
