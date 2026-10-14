@@ -25,7 +25,7 @@ The collector is the only component that talks to both sides. It has no
 persistent storage of its own — all state is in-memory Prometheus metric
 objects (`prometheus_client.Counter` / `Gauge`), which is why a collector
 restart resets counters to zero. That's an accepted trade-off for this stage
-of the project; the roadmap's AWS/S3 archival step (see `roadmap.md`) is what
+of the project; the roadmap's GCS archival step (see `roadmap.md`) is what
 would add durable storage independent of the collector's process lifetime.
 
 ## Why bidirectional gRPC streaming (not unary calls, not REST)
@@ -87,7 +87,8 @@ addresses anywhere in `agent/` or `collector/`. This is what makes the exact
 same Docker image behave correctly in three different contexts without a
 rebuild: a bare local process (`COLLECTOR_ADDRESS=localhost:50051`), a
 Compose service (`COLLECTOR_ADDRESS=collector:50051`, resolved by Docker's
-embedded DNS), and — per the roadmap — an AWS ECS task (`COLLECTOR_ADDRESS`
-pointing at a service-discovery name or load balancer). It's the standard
+embedded DNS), and — per the roadmap — a GKE pod (`COLLECTOR_ADDRESS`
+pointing at a Kubernetes Service DNS name or an Ingress/LoadBalancer
+address). It's the standard
 12-factor-app pattern, applied because this project is explicitly meant to
 demonstrate deployability, not just local correctness.

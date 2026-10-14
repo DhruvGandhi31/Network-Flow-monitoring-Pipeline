@@ -89,12 +89,13 @@ pytest -v
 
 ## Roadmap
 
-- [ ] **AWS integration**: archive raw `FlowBatch` records to S3 (via Kinesis
-      Firehose or direct `boto3` PutRecord) for durable storage / offline
-      analysis, separate from the real-time Prometheus path.
+- [ ] **GCP integration**: archive raw `FlowBatch` records to Cloud Storage
+      (GCS) — direct write from the collector, or via Pub/Sub — for durable
+      storage / offline analysis, separate from the real-time Prometheus
+      path.
 - [ ] **CI/CD**: `.github/workflows/ci.yml` currently lints, tests, and
-      builds images. Extend to push images to ECR and deploy the collector
-      to ECS/Fargate via Terraform (`infra/`).
+      builds images. Extend to push images to Artifact Registry and deploy
+      the collector to GKE (Autopilot) via Terraform (`infra/`).
 - [ ] **Anomaly detection**: a simple stats-based detector (e.g. z-score on
       per-agent flow rate) that flags spikes and exposes them as a Prometheus
       metric/alert.

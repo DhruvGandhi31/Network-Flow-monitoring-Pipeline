@@ -20,8 +20,8 @@ dev = [
   "pytest>=8.0",
   "ruff>=0.5",
 ]
-aws = [
-  "boto3>=1.34",
+gcp = [
+  "google-cloud-storage>=2.18",
 ]
 
 [tool.setuptools.packages.find]
