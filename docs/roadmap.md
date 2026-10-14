@@ -32,9 +32,9 @@ Two shapes considered, neither implemented:
   revisit Pub/Sub+Dataflow only if the direct path proves limiting.
 
 `infra/terraform/` now holds the first slice (API enablement, Artifact
-Registry repo, GCS archive bucket — see its README; validated but not yet
-applied). Still to add: a service account + IAM binding for the collector to
-write to the bucket, and the GKE resources below.
+Registry repo, GCS archive bucket, collector + CI service accounts, Workload
+Identity Federation for GitHub Actions — see its README; validated but not yet
+applied). Still to add: the GKE resources below.
 
 ## 2. CI/CD deploy step
 
