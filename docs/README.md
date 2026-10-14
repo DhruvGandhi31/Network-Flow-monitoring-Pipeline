@@ -16,7 +16,7 @@ back up.
 5. [deployment.md](deployment.md) — Dockerfiles, Compose stack, and the CI pipeline.
 6. [configuration.md](configuration.md) — every environment variable, its default, and what reads it.
 7. [verification-log.md](verification-log.md) — the actual commands run and real output observed while building this, session by session.
-8. [roadmap.md](roadmap.md) — what's explicitly not built yet (AWS, CI/CD deploy, anomaly detection) and the shape each is expected to take.
+8. [roadmap.md](roadmap.md) — what's explicitly not built yet (GCP integration, CI/CD deploy, anomaly detection) and the shape each is expected to take.
 
 ## One-paragraph summary
 

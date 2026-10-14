@@ -60,8 +60,9 @@ Triggers on push/PR to `main`. Two jobs:
 2. **`build-images`** (`needs: test`): checkout → `docker build -f
    docker/collector.Dockerfile -t netflow-sentry-collector:ci .` → same for
    the agent image. This only proves the images *build*; nothing is pushed
-   to a registry and nothing is deployed. Extending this to push to ECR and
-   deploy to ECS/Fargate is the CI/CD half of the roadmap (`roadmap.md`).
+   to a registry and nothing is deployed. Extending this to push to Artifact
+   Registry and deploy to GKE (Autopilot) is the CI/CD half of the roadmap
+   (`roadmap.md`).
 
 ## Running it
 

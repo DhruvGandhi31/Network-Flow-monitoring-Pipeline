@@ -1,5 +1,5 @@
 """Shared configuration, sourced from environment variables so both the
-agent and collector run unmodified in Docker/AWS without code changes."""
+agent and collector run unmodified in Docker/GCP without code changes."""
 
 from __future__ import annotations
 

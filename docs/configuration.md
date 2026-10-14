@@ -21,5 +21,5 @@ flags, and no hardcoded addresses in application code.
   `environment:` block.
 - **CI**: not set — the CI pipeline only lints/tests/builds, it doesn't run
   the services against each other.
-- **AWS (not yet built)**: expected to come from ECS task definition
-  environment variables / Secrets Manager, per `roadmap.md`.
+- **GCP (not yet built)**: expected to come from the GKE Pod spec's `env:`
+  fields, sourced from a ConfigMap/Secret, per `roadmap.md`.

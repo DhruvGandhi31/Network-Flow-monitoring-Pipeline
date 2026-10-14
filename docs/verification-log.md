@@ -5,6 +5,22 @@ has merely been written. Kept so future work doesn't have to guess whether a
 claim like "the dashboard works" was verified or assumed. See `CLAUDE.md` →
 "Verification standard for this repo" for the policy this log is enforcing.
 
+## Decision — cloud provider pivoted from AWS to GCP (2026-10-14)
+
+The cloud-integration step of the roadmap (archival storage + CI/CD deploy)
+was originally planned around AWS (S3/Kinesis Firehose, ECR, ECS/Fargate).
+Switched to GCP because the `gcloud` CLI was already set up and
+authenticated in this environment, and no AWS-specific code had been
+written yet — `infra/` was still an empty placeholder, and the only
+AWS-specific artifact anywhere was an unused `aws` extra (`boto3`) in
+`pyproject.toml`, which was renamed to `gcp` (`google-cloud-storage`) as
+part of this change. No infrastructure of either provider has been
+provisioned at this point — this was a planning-only pivot, reflected in
+`roadmap.md`, `architecture.md`, `README.md`, and `CLAUDE.md`. Compute
+target for the collector deploy was chosen as **GKE Autopilot** (over Cloud
+Run or a bare Compute Engine VM) specifically for the Kubernetes resume
+signal — see `roadmap.md` §2 for the trade-off discussion.
+
 ## Session 1 — initial build, bare-process smoke test
 
 After scaffolding the full project (proto, agent, collector, Docker,
