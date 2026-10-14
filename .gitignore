@@ -15,5 +15,6 @@ src/netflow_sentry/proto_gen/*.pyi
 .terraform/
 *.tfstate
 *.tfstate.backup
+*.tfvars
 .pytest_cache/
 .ruff_cache/

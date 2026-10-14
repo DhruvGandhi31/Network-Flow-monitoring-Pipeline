@@ -31,9 +31,10 @@ Two shapes considered, neither implemented:
   that favored plain S3 over Kinesis Firehose in the original AWS plan) —
   revisit Pub/Sub+Dataflow only if the direct path proves limiting.
 
-`infra/` exists as an empty directory, reserved for Terraform (provider
-`google`) defining the GCS bucket, a service account + IAM binding for the
-collector to write to it, and eventually the GKE resources below.
+`infra/terraform/` now holds the first slice (API enablement, Artifact
+Registry repo, GCS archive bucket — see its README; validated but not yet
+applied). Still to add: a service account + IAM binding for the collector to
+write to the bucket, and the GKE resources below.
 
 ## 2. CI/CD deploy step
 
