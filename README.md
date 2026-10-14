@@ -80,6 +80,10 @@ connections owned by other processes/users, depending on OS.
 | `BATCH_FLUSH_SECONDS` | agent | `5` | How often a batch is captured and sent |
 | `GRPC_PORT` | collector | `50051` | gRPC listen port |
 | `METRICS_PORT` | collector | `9100` | Prometheus `/metrics` HTTP port |
+| `ARCHIVE_BUCKET` | collector | *(unset)* | GCS bucket name; setting it enables archival of raw records (needs `.[gcp]` and GCP credentials) |
+| `ARCHIVE_LOCAL_DIR` | collector | *(unset)* | Dev alternative: archive to a local directory instead (mutually exclusive with `ARCHIVE_BUCKET`) |
+| `ARCHIVE_FLUSH_SECONDS` | collector | `60` | How often buffered records are written out as one object |
+| `ARCHIVE_MAX_BUFFERED_RECORDS` | collector | `50000` | In-memory cap; records beyond it are dropped and counted |
 
 ## Tests
 
@@ -89,10 +93,10 @@ pytest -v
 
 ## Roadmap
 
-- [ ] **GCP integration**: archive raw `FlowBatch` records to Cloud Storage
-      (GCS) — direct write from the collector, or via Pub/Sub — for durable
-      storage / offline analysis, separate from the real-time Prometheus
-      path.
+- [x] **GCS archival (code)**: the collector can archive raw flow records to
+      Cloud Storage (or a local dir) as gzipped NDJSON, separate from the
+      real-time Prometheus path. Not yet verified against a real bucket —
+      that happens when the infrastructure in `infra/terraform` is applied.
 - [ ] **CI/CD**: `.github/workflows/ci.yml` currently lints, tests, and
       builds images. Extend to push images to Artifact Registry and deploy
       the collector to GKE (Autopilot) via Terraform (`infra/`).

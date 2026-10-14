@@ -15,6 +15,10 @@ AgentConfig:
 CollectorConfig:
     grpc_port: int      # GRPC_PORT, default: 50051
     metrics_port: int   # METRICS_PORT, default: 9100
+    archive_bucket: str                  # ARCHIVE_BUCKET, default: "" (disabled)
+    archive_local_dir: str               # ARCHIVE_LOCAL_DIR, default: "" (disabled)
+    archive_flush_seconds: float         # ARCHIVE_FLUSH_SECONDS, default: 60
+    archive_max_buffered_records: int    # ARCHIVE_MAX_BUFFERED_RECORDS, default: 50000
 ```
 
 `capture_interval_seconds` is parsed but not currently consumed anywhere —
@@ -113,3 +117,41 @@ connection, so 16 is the practical concurrent-agent ceiling for a single
 collector instance as currently configured (not tuned for scale, just a
 default). Registers the servicer, binds `[::]:{GRPC_PORT}` (all interfaces,
 IPv4+IPv6), starts, and blocks on `wait_for_termination()`.
+
+It also builds the optional archiver (`build_archiver`) and handles shutdown:
+`SIGTERM` (sent by Kubernetes and `docker stop`) and Ctrl+C both call
+`server.stop(grace=1)`, after which `archiver.close()` does a final flush so
+buffered records aren't lost on a normal stop. The grace period is
+deliberately short: agent streams are long-lived, so `stop()` always waits it
+out, and it must fit inside the runtime's stop timeout (Docker Desktop was
+observed killing the container after ~3s, which an earlier `grace=5` exceeded).
+
+### `archive.py`
+
+Durable archival of raw `FlowRecord`s, enabled by `ARCHIVE_BUCKET` (GCS) or
+`ARCHIVE_LOCAL_DIR` (dev). Pieces:
+
+- `FlowArchiver` — `add(records)` is called from gRPC handler threads and only
+  appends to an in-memory buffer, so slow or failing storage can never stall
+  an agent stream. A daemon thread calls `flush()` every
+  `ARCHIVE_FLUSH_SECONDS`, writing everything buffered as **one**
+  gzipped NDJSON object (one line per record, plus a collector-side
+  `received_at`). One object per batch would create an object every few
+  seconds per agent.
+- Failure handling: a failed write increments
+  `netflow_archive_write_failures_total` and the rows are put back at the
+  front of the buffer to be retried on the next flush. The buffer is capped
+  at `ARCHIVE_MAX_BUFFERED_RECORDS`; overflow drops the newest records on
+  `add()` (or the oldest on re-buffering) and counts them in
+  `netflow_archive_records_dropped_total`. Loss is bounded and visible rather
+  than unbounded memory growth.
+- `Sink` — a one-method protocol (`write(name, bytes)`). `GCSSink` uploads to
+  a bucket via Application Default Credentials (the `google-cloud-storage`
+  import is lazy, so it stays an optional `.[gcp]` dependency; the collector
+  Dockerfile installs it). `LocalDirSink` writes under a directory.
+- Object names are Hive-style partitioned:
+  `flows/dt=YYYY-MM-DD/hour=HH/<timestamp>-<rand>.ndjson.gz` (UTC), so
+  BigQuery/Athena-style tools can prune by date later.
+- `record_to_dict` serializes fields explicitly rather than using
+  `MessageToDict`, which would turn `int64` fields into strings. A test
+  asserts it covers every field in `flow.proto`.

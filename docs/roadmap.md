@@ -18,11 +18,16 @@ real-time Prometheus path (which only ever holds aggregated counters, never
 raw records — once a batch is processed, its individual `FlowRecord`s are
 gone).
 
-Two shapes considered, neither implemented:
-- **Direct**: collector uses `google-cloud-storage` (to be added as a `gcp`
-  extra in `pyproject.toml`, replacing the earlier unused `aws`/`boto3`
-  extra) to upload each batch (or a rolled-up window of batches) to a GCS
-  bucket directly from the collector process.
+**Status: the direct approach is implemented** (`collector/archive.py`, see
+`components.md`) and tested against a fake sink, a mocked GCS client, and live
+with a local-directory sink (including a `docker stop` final flush). **Not yet
+verified against a real GCS bucket** — that needs the Terraform in
+`infra/terraform` applied with billing enabled.
+
+Two shapes considered:
+- **Direct** (built): collector uses `google-cloud-storage` (the `gcp` extra
+  in `pyproject.toml`) to upload a rolled-up window of records as one object
+  to a GCS bucket directly from the collector process.
 - **Via Pub/Sub + Dataflow**: collector publishes each batch to a Pub/Sub
   topic; a Dataflow (or Cloud Function) sink batches/writes to GCS on its
   own schedule — decouples the collector from GCS write latency/throttling,

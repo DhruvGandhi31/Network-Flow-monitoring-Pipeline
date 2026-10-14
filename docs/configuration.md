@@ -12,6 +12,10 @@ flags, and no hardcoded addresses in application code.
 | `BATCH_FLUSH_SECONDS` | `AgentConfig` | `5` | How often the agent captures a fresh snapshot and sends it as a `FlowBatch`. |
 | `GRPC_PORT` | `CollectorConfig` | `50051` | Port the collector's gRPC server binds (`[::]:{port}`, all interfaces). |
 | `METRICS_PORT` | `CollectorConfig` | `9100` | Port serving the Prometheus `/metrics` endpoint. |
+| `ARCHIVE_BUCKET` | `CollectorConfig` | *(unset)* | GCS bucket for raw-record archival. Unset (and no `ARCHIVE_LOCAL_DIR`) disables archival entirely. Credentials come from Application Default Credentials (Workload Identity on GKE). |
+| `ARCHIVE_LOCAL_DIR` | `CollectorConfig` | *(unset)* | Archive to this local directory instead of GCS — for development/testing without cloud access. Setting both this and `ARCHIVE_BUCKET` is a startup error. |
+| `ARCHIVE_FLUSH_SECONDS` | `CollectorConfig` | `60` | Interval at which buffered records are written as a single object. |
+| `ARCHIVE_MAX_BUFFERED_RECORDS` | `CollectorConfig` | `50000` | Cap on records held in memory awaiting a flush; overflow is dropped and counted in `netflow_archive_records_dropped_total`. |
 
 ## Where each is set today
 

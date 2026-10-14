@@ -10,7 +10,7 @@ COPY scripts ./scripts
 COPY src ./src
 
 RUN python scripts/generate_proto.py
-RUN pip install --no-cache-dir -e .
+RUN pip install --no-cache-dir -e ".[gcp]"
 
 EXPOSE 50051 9100
 

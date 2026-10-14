@@ -31,6 +31,26 @@ LAST_BATCH_SIZE = Gauge(
     ["agent_id"],
 )
 
+ARCHIVE_OBJECTS_WRITTEN_TOTAL = Counter(
+    "netflow_archive_objects_written_total",
+    "Total number of archive objects successfully written to storage.",
+)
+
+ARCHIVE_RECORDS_WRITTEN_TOTAL = Counter(
+    "netflow_archive_records_written_total",
+    "Total number of flow records successfully archived.",
+)
+
+ARCHIVE_WRITE_FAILURES_TOTAL = Counter(
+    "netflow_archive_write_failures_total",
+    "Total number of failed archive writes (records are re-buffered and retried).",
+)
+
+ARCHIVE_RECORDS_DROPPED_TOTAL = Counter(
+    "netflow_archive_records_dropped_total",
+    "Total number of records dropped because the archive buffer was full.",
+)
+
 _seen_agents: set[str] = set()
 
 
