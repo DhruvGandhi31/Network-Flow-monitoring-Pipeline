@@ -5,6 +5,29 @@ has merely been written. Kept so future work doesn't have to guess whether a
 claim like "the dashboard works" was verified or assumed. See `CLAUDE.md` →
 "Verification standard for this repo" for the policy this log is enforcing.
 
+## Session 3 — GCS archival (2026-10-15)
+
+Verified without cloud access, using the `ARCHIVE_LOCAL_DIR` sink:
+
+- `ruff check src tests` clean; `pytest` 21 passed (archive batching, retry,
+  overflow, GCS client mock, servicer, config).
+- Live bare processes: collector (`ARCHIVE_FLUSH_SECONDS=4`) + agent. After
+  ~12s `/metrics` showed `netflow_archive_objects_written_total 3`,
+  `netflow_archive_records_written_total 637`, failures 0, dropped 0; three
+  `flows/dt=.../hour=.../*.ndjson.gz` files existed; the first held 125 valid
+  JSON lines of real Windows connections (e.g. `lsass.exe LISTEN`).
+- Collector image built with the `[gcp]` extra; `google.cloud.storage` imports
+  inside the container.
+- Graceful shutdown in the container (`ARCHIVE_FLUSH_SECONDS=3600`, so only the
+  final flush can write): `docker stop` produced one archive object with the
+  buffered records and exit code 0.
+- **Bug found by that test:** the first version used `server.stop(grace=5)`;
+  plain `docker stop` killed the container after ~3s (exit 137, nothing
+  flushed) while `docker stop -t 30` and `docker kill -s TERM` worked. Fixed by
+  lowering the grace to 1s; re-tested: 2s stop, exit 0, records archived.
+- **Not verified:** an actual upload to a real GCS bucket, and GCS credentials
+  / Workload Identity. Cannot be done until the Terraform is applied.
+
 ## Decision — cloud provider pivoted from AWS to GCP (2026-10-14)
 
 The cloud-integration step of the roadmap (archival storage + CI/CD deploy)

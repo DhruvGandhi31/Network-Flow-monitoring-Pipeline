@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 
+from netflow_sentry.collector.archive import FlowArchiver
 from netflow_sentry.collector.metrics import record_batch
 from netflow_sentry.proto_gen import flow_pb2, flow_pb2_grpc
 
@@ -15,6 +16,9 @@ logger = logging.getLogger(__name__)
 
 
 class FlowCollectorServicer(flow_pb2_grpc.FlowCollectorServicer):
+    def __init__(self, archiver: FlowArchiver | None = None):
+        self._archiver = archiver
+
     def StreamFlows(self, request_iterator, context):
         peer = context.peer()
         logger.info("agent stream opened: %s", peer)
@@ -23,6 +27,8 @@ class FlowCollectorServicer(flow_pb2_grpc.FlowCollectorServicer):
             for batch in request_iterator:
                 batch_count += 1
                 record_batch(batch.agent_id, batch.records)
+                if self._archiver is not None:
+                    self._archiver.add(batch.records)
                 logger.debug(
                     "batch #%d from %s: %d records",
                     batch_count,

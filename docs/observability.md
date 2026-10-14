@@ -7,6 +7,12 @@ every 5 seconds (`deploy/prometheus/prometheus.yml`, single job
 `netflow-collector`, target `collector:9100` — the Docker Compose service
 name, resolved via Compose's embedded DNS).
 
+When archival is enabled the collector also exports
+`netflow_archive_objects_written_total`, `netflow_archive_records_written_total`,
+`netflow_archive_write_failures_total` and `netflow_archive_records_dropped_total`
+(unlabelled counters; not yet on the dashboard). A non-zero failures or dropped
+counter is the signal that archival is unhealthy.
+
 `prometheus_client` also auto-exports standard process/GC metrics
 (`python_gc_objects_collected_total`, `python_info`, etc.) alongside the
 `netflow_*` metrics — visible on `/metrics` but not surfaced on the

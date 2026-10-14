@@ -29,10 +29,20 @@ class AgentConfig:
 class CollectorConfig:
     grpc_port: int
     metrics_port: int
+    archive_bucket: str
+    archive_local_dir: str
+    archive_flush_seconds: float
+    archive_max_buffered_records: int
 
     @classmethod
     def from_env(cls) -> CollectorConfig:
         return cls(
             grpc_port=int(os.environ.get("GRPC_PORT", "50051")),
             metrics_port=int(os.environ.get("METRICS_PORT", "9100")),
+            archive_bucket=os.environ.get("ARCHIVE_BUCKET", ""),
+            archive_local_dir=os.environ.get("ARCHIVE_LOCAL_DIR", ""),
+            archive_flush_seconds=float(os.environ.get("ARCHIVE_FLUSH_SECONDS", "60")),
+            archive_max_buffered_records=int(
+                os.environ.get("ARCHIVE_MAX_BUFFERED_RECORDS", "50000")
+            ),
         )
