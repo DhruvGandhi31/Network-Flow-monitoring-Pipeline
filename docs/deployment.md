@@ -50,14 +50,19 @@ host instead of inside Compose (see root `README.md`).
 
 ## CI — `.github/workflows/ci.yml`
 
-Triggers on push/PR to `main`. Two jobs:
+Triggers on push/PR to `main`. Three jobs:
 
 1. **`test`** (ubuntu-latest): checkout → `actions/setup-python@v5` (3.12) →
    `pip install -r requirements.txt` + `pip install -e ".[dev]"` → **regenerate
    proto stubs** (`python scripts/generate_proto.py` — CI does not rely on
    any committed generated code, consistent with the gitignore policy) →
    `ruff check src tests` → `pytest -v`.
-2. **`build-images`** (`needs: test`): checkout → `docker build -f
+2. **`terraform`** (independent of `test`, runs in parallel; working directory
+   `infra/terraform`): `hashicorp/setup-terraform@v3` (1.9.8) → `terraform fmt
+   -check -recursive` → `terraform init -backend=false` → `terraform validate`.
+   Needs no GCP credentials — it checks syntax, formatting, and provider
+   schema only; it never plans or applies.
+3. **`build-images`** (`needs: test`): checkout → `docker build -f
    docker/collector.Dockerfile -t netflow-sentry-collector:ci .` → same for
    the agent image. This only proves the images *build*; nothing is pushed
    to a registry and nothing is deployed. Extending this to push to Artifact
