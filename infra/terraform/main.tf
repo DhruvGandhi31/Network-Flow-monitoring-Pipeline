@@ -5,6 +5,8 @@ locals {
     "iam.googleapis.com",
     "iamcredentials.googleapis.com",
     "sts.googleapis.com",
+    "container.googleapis.com",
+    "compute.googleapis.com",
   ]
 }
 

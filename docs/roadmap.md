@@ -38,8 +38,9 @@ Two shapes considered:
 
 `infra/terraform/` now holds the first slice (API enablement, Artifact
 Registry repo, GCS archive bucket, collector + CI service accounts, Workload
-Identity Federation for GitHub Actions — see its README; validated but not yet
-applied). Still to add: the GKE resources below.
+Identity Federation for GitHub Actions, and an opt-in GKE Autopilot cluster
+behind `create_cluster` — see its README; planned against the real project but
+not yet applied). Still to add: the Kubernetes manifests and the CD workflow.
 
 ## 2. CI/CD deploy step
 

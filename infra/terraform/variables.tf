@@ -39,6 +39,30 @@ variable "wif_pool_id" {
   default     = "github-actions"
 }
 
+variable "create_cluster" {
+  description = "Create the GKE Autopilot cluster and its IAM. Off by default because it is the only resource that bills while it exists; turn on to deploy, destroy afterwards."
+  type        = bool
+  default     = false
+}
+
+variable "cluster_name" {
+  description = "Name of the GKE Autopilot cluster."
+  type        = string
+  default     = "netflow-sentry"
+}
+
+variable "k8s_namespace" {
+  description = "Kubernetes namespace the collector runs in (must match the manifests)."
+  type        = string
+  default     = "netflow-sentry"
+}
+
+variable "k8s_service_account" {
+  description = "Kubernetes service account the collector pod uses (must match the manifests)."
+  type        = string
+  default     = "collector"
+}
+
 variable "labels" {
   description = "Labels applied to all resources that support them."
   type        = map(string)

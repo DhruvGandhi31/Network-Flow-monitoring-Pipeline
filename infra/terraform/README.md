@@ -10,6 +10,30 @@ later, separate change.
 | `google_artifact_registry_repository.images` | Docker repo for the collector/agent images CI will push. |
 | `google_storage_bucket.archive` | Archive for raw `FlowBatch` records. Uniform access, public access prevented, objects auto-deleted after `archive_retention_days` (default 30). |
 
+### GKE Autopilot (`gke.tf`) — opt-in, bills while it exists
+
+Everything in `gke.tf` is gated on `create_cluster` (default `false`), so a
+plain `terraform apply` provisions only the cheap resources above and cannot
+start billing by accident.
+
+```bash
+terraform apply -var create_cluster=true     # +9 resources incl. the cluster
+# ...deploy, verify...
+terraform destroy                            # tear everything down
+```
+
+| Resource | Purpose |
+|---|---|
+| `google_container_cluster.autopilot` | Regional Autopilot cluster, REGULAR channel. `deletion_protection = false` because the provider default (true) would make `destroy` fail. Workload Identity is automatic on Autopilot. |
+| `google_service_account.gke_nodes` + IAM | Dedicated node identity (logging/monitoring roles, plus `artifactregistry.reader` on the image repo only) instead of the broad default Compute service account. |
+| `collector_workload_identity` | Lets the Kubernetes SA `netflow-sentry/collector` (`k8s_namespace` / `k8s_service_account` vars — must match the manifests) act as the collector GCP service account, i.e. write to the archive bucket without any key. Created after the cluster because the cluster creates the `<project>.svc.id.goog` pool. |
+| `ci_gke_deployer` | `roles/container.developer` for the CI service account so the deploy workflow can get credentials and apply manifests. |
+
+Cost: Autopilot bills for pod resource requests while pods run, and the
+per-cluster management fee is normally offset by the monthly free-tier credit
+(one cluster per billing account). Treat it as a few cents per hour of testing,
+and destroy when done. Needs billing linked on the project.
+
 ### Identity (`iam.tf`)
 
 No service-account keys are created anywhere.
@@ -54,5 +78,6 @@ target whatever project `gcloud` happens to have active.
 - `.terraform.lock.hcl` is committed to pin provider versions.
 - The bucket has `force_destroy = true` so `terraform destroy` works even
   with archived objects in it. Revisit before storing anything you care about.
-- Validated with `terraform fmt -check` and `terraform validate` (v1.9.8).
-  Not yet `plan`/`apply`-ed against a real project.
+- CI runs `fmt -check` and `validate`. Locally, `plan` has been run against the
+  real project (16 resources to add with the cluster off, 25 with it on), but
+  nothing has been `apply`-ed yet.

@@ -5,6 +5,14 @@ has merely been written. Kept so future work doesn't have to guess whether a
 claim like "the dashboard works" was verified or assumed. See `CLAUDE.md` →
 "Verification standard for this repo" for the policy this log is enforcing.
 
+## Session 4 — GKE Autopilot Terraform (2026-10-15)
+
+- `terraform fmt`/`validate` clean. With a short-lived `gcloud` access token,
+  ran a read-only `terraform plan` against `netflow-sentry-90462`: **16 to add**
+  with `create_cluster=false` (default), **25 to add** with `true`; 0 change /
+  0 destroy in both. Nothing was applied, so no GCP resources exist yet and
+  the cluster's real create/destroy behaviour is unverified.
+
 ## Session 3 — GCS archival (2026-10-15)
 
 Verified without cloud access, using the `ARCHIVE_LOCAL_DIR` sink:

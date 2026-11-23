@@ -18,6 +18,18 @@ output "workload_identity_provider" {
   value       = google_iam_workload_identity_pool_provider.github.name
 }
 
+output "cluster_name" {
+  description = "GKE cluster name, or null when create_cluster is false."
+  value       = one(google_container_cluster.autopilot[*].name)
+}
+
+output "get_credentials_command" {
+  description = "Command to point kubectl at the cluster (null when create_cluster is false)."
+  value = var.create_cluster ? (
+    "gcloud container clusters get-credentials ${var.cluster_name} --region ${var.region} --project ${var.project_id}"
+  ) : null
+}
+
 output "archive_bucket" {
   description = "GCS bucket for archived FlowBatch records."
   value       = google_storage_bucket.archive.name
